@@ -13,7 +13,7 @@ st.set_page_config(page_title="Hypertension Risk Prediction", page_icon="🩺", 
 # ---------- LOAD MODEL ----------
 @st.cache_resource
 def load_model():
-    model_path = "/content/random_forest_model.pkl"   # place model in models/ folder
+    model_path = "random_forest_model.pkl"   # place model in models/ folder
     if not os.path.exists(model_path):
         st.error(f"❌ Model file not found at: {model_path}. Please check your repo structure.")
         st.stop()
