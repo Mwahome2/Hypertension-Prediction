@@ -55,23 +55,32 @@ with st.form("patient_form"):
 
 # ---------- PREDICTION ----------
 if submitted:
-    # Prepare input data
+    # Prepare input data with correct feature names
     input_data = pd.DataFrame({
-        "age": [age],
-        "gender": [1 if gender == "Male" else 0],
-        "bmi": [bmi],
-        "weight": [weight],
-        "systolic_bp": [systolic_bp],
-        "diastolic_bp": [diastolic_bp],
-        "cholesterol": [cholesterol],
-        "glucose": [glucose],
-        "smoker": [1 if smoker == "Yes" else 0],
-        "physical_activity": [0 if physical_activity == "Low" else 1 if physical_activity == "Moderate" else 2],
-        "family_history": [1 if family_history == "Yes" else 0],
-        "alcohol_intake": [1 if alcohol_intake == "Yes" else 0]
+        "AGE": [age],
+        "GENDER": [1 if gender == "Male" else 0],
+        "BMI": [bmi],
+        "BLOOD SUGAR(mmol/L)": [glucose],
+        "SYSTOLIC BP": [systolic_bp],
+        "DIASTOLIC BP": [diastolic_bp],
+        "HTN": [1],                 # placeholder if model expects it
+        "DIABETES": [0],            # default if not in form
+        "BOTH DM+HTN": [0],         # default if not in form
     })
 
     try:
+        # Align columns with model training features
+        if hasattr(model, "feature_names_in_"):
+            model_features = model.feature_names_in_
+        else:
+            model_features = input_data.columns
+
+        for col in model_features:
+            if col not in input_data.columns:
+                input_data[col] = 0
+        input_data = input_data[model_features]
+
+        # Predict
         pred = model.predict(input_data)[0]
         prob = model.predict_proba(input_data)[0][1]
 
@@ -88,7 +97,7 @@ if submitted:
         st.write(f"**Probability of Hypertension:** {prob:.2f}")
         st.info(f"**Risk Level:** {risk_level}")
 
-        # ---------- OPTIONAL: SAVE LOG ----------
+        # ---------- SAVE LOG ----------
         record = {
             "Timestamp": [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
             "Age": [age],
@@ -113,3 +122,4 @@ if submitted:
 # ---------- FOOTER ----------
 st.markdown("---")
 st.caption("Developed by Millicent Chesang | Powered by AI & Data Analytics for Public Health")
+
