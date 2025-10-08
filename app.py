@@ -84,18 +84,52 @@ if submitted:
         pred = model.predict(input_data)[0]
         prob = model.predict_proba(input_data)[0][1]
 
-        # Interpret results
+        # Interpret results and generate message
         if prob < 0.33:
             risk_level = "🟢 Low Risk"
+            message = (
+                "Your predicted hypertension risk is **low**. "
+                "This suggests normal blood pressure levels and minimal risk of related complications. "
+                "Maintain a healthy lifestyle, balanced diet, and regular physical activity."
+            )
         elif prob < 0.66:
             risk_level = "🟠 Moderate Risk"
+            message = (
+                "Your predicted hypertension risk is **moderate**. "
+                "This may indicate pre-hypertension or early signs of elevated blood pressure. "
+                "It's advisable to monitor your BP regularly, reduce salt intake, and maintain a healthy weight."
+            )
         else:
             risk_level = "🔴 High Risk"
+            message = (
+                "Your predicted hypertension risk is **high**. "
+                "This may signal possible hypertension and higher risk of heart disease, kidney problems, or stroke. "
+                "Please consult a healthcare provider for detailed evaluation and management."
+            )
 
+        # ---------- DISPLAY RESULTS ----------
         st.markdown("## 🧠 Prediction Results")
         st.success(f"**Predicted Status:** {'Hypertensive' if pred == 1 else 'Normal'}")
         st.write(f"**Probability of Hypertension:** {prob:.2f}")
         st.info(f"**Risk Level:** {risk_level}")
+        st.markdown(f"### 💬 Interpretation\n{message}")
+
+        # ---------- RELATED HEALTH RISKS ----------
+        st.markdown("### 🫀 Related Risk Summary")
+
+        if prob < 0.33:
+            st.write("**Cardiovascular Strain:** Low")
+            st.write("**Stroke Risk:** Low")
+            st.write("**Diabetes Correlation:** Low")
+        elif prob < 0.66:
+            st.write("**Cardiovascular Strain:** Moderate")
+            st.write("**Stroke Risk:** Moderate")
+            st.write("**Diabetes Correlation:** Slightly Elevated")
+        else:
+            st.write("**Cardiovascular Strain:** High")
+            st.write("**Stroke Risk:** High")
+            st.write("**Diabetes Correlation:** High")
+            st.warning("⚠️ Please consider full medical evaluation for cardiovascular and metabolic health.")
 
         # ---------- SAVE LOG ----------
         record = {
@@ -122,4 +156,5 @@ if submitted:
 # ---------- FOOTER ----------
 st.markdown("---")
 st.caption("Developed by Millicent Chesang | Powered by AI & Data Analytics for Public Health")
+
 
